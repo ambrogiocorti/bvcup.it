@@ -1,0 +1,85 @@
+﻿﻿﻿﻿<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Beach Volley Cup | Almici & Friends</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/style.css"/>
+    <link rel="shortcut icon" href="favicon.svg" type="image/x-icon">
+  </head>
+  <body class="public-page">
+    <div class="page-shell">
+      <header class="public-header">
+        <button id="admin-access-btn" class="admin-fab" title="Accesso amministratore" aria-label="Apri login admin">
+          <i class="fa-solid fa-lock"></i>
+        </button>
+
+        <div class="public-title-wrap">
+          <h1 class="public-title"><i class="fa-solid fa-volleyball"></i> Beach Volley Cup</h1>
+          <p class="public-subtitle" id="public-subtitle">Torneo Almici - Risultati e Live</p>
+        </div>
+      </header>
+
+      <main class="container" id="main-content">
+
+        <section class="card hidden" id="sport-context-card">
+          <div class="card-body" id="sport-context-content"></div>
+        </section>
+
+        <section class="card" id="standings-card">
+          <div class="card-header" id="standing-title"><i class="fa-solid fa-list-ol"></i> Classifica</div>
+          <div class="card-body" id="standings-container">
+            <div class="empty-state">Seleziona un torneo.</div>
+          </div>
+        </section>
+
+        <section class="card" id="matches-card">
+          <div class="card-header" id="matches-title"><i class="fa-solid fa-calendar-days"></i> Calendario e Risultati</div>
+          <div id="matches-container">
+            <div class="empty-state">In attesa di selezione torneo.</div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div id="match-details-modal" class="modal-overlay">
+      <div class="modal-box match-details-modal-box">
+        <div class="modal-header">
+          <h2 style="margin: 0"><i class="fa-solid fa-circle-info"></i> Dettaglio Match</h2>
+          <button class="close-btn" id="match-details-close-btn" aria-label="Chiudi">&times;</button>
+        </div>
+        <div id="match-details-content"></div>
+      </div>
+    </div>
+
+    <div id="modal-login" class="modal-overlay">
+      <div class="modal-box" style="max-width: 380px">
+        <div class="modal-header">
+          <h2 style="margin: 0">Area Amministratore</h2>
+          <button class="close-btn" id="login-cancel-btn" aria-label="Chiudi">&times;</button>
+        </div>
+
+        <div class="inline-grid" style="gap: 12px">
+          <div class="field">
+            <label for="login-email">Email</label>
+            <input type="email" id="login-email" placeholder="nome@scuola.it" autocomplete="email" />
+          </div>
+          <div class="field">
+            <label for="login-pass">Password</label>
+            <input type="password" id="login-pass" placeholder="Password" autocomplete="current-password" />
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 18px">
+          <button class="btn btn-primary" id="login-submit-btn" style="flex: 1">Accedi</button>
+          <button class="btn btn-ghost" id="login-cancel-btn-2" style="flex: 1">Annulla</button>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="js/main-index.js"></script>
+  </body>
+</html>

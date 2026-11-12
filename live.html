@@ -1,0 +1,118 @@
+﻿<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Live Match | Tornei Scolastici</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/style.css"/>
+    <link rel="shortcut icon" href="favicon.svg" type="image/x-icon">
+  </head>
+  <body class="live-page">
+    <div class="live-shell">
+      <section class="card">
+        <div class="card-body">
+          <div class="top-row" style="margin-bottom: 8px">
+            <div>
+              <h1 class="page-title" id="live-match-title">Match Live</h1>
+              <div class="muted" id="live-match-meta">-</div>
+            </div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap">
+              <button class="btn btn-ghost" id="btn-back-admin"><i class="fa-solid fa-arrow-left"></i> Torna Admin</button>
+              <button class="btn btn-primary" id="btn-save-snapshot" data-requires-edit><i class="fa-solid fa-floppy-disk"></i> Salva Snapshot</button>
+              <button class="btn btn-danger" id="btn-finalize-match" data-requires-edit><i class="fa-solid fa-flag-checkered"></i> Chiudi Match</button>
+            </div>
+          </div>
+          <div id="live-lock-status" class="lock-banner locked">In attesa lock...</div>
+        </div>
+      </section>
+
+      <section class="live-scoreboard">
+        <div class="team-block">
+          <h2 class="team-name" id="live-home-name">Casa</h2>
+          <div class="live-score" id="live-home-score">0</div>
+          <div class="score-actions">
+            <button class="btn btn-ghost" data-requires-edit data-score-team="home" data-score-delta="1">+1</button>
+            <button class="btn btn-ghost" data-requires-edit data-score-team="home" data-score-delta="2">+2</button>
+            <button class="btn btn-ghost" data-requires-edit data-score-team="home" data-score-delta="3">+3</button>
+            <button class="btn btn-ghost" data-requires-edit data-score-team="home" data-score-delta="-1">-1</button>
+          </div>
+        </div>
+
+        <div class="timer-card">
+          <p class="timer-value" id="live-timer">00:00</p>
+          <div class="badge badge-info" id="live-quarter" style="justify-content: center">Q1</div>
+          <div class="timer-actions">
+            <button class="btn btn-primary" id="btn-timer-start" data-requires-edit>Start</button>
+            <button class="btn btn-ghost" id="btn-timer-stop" data-requires-edit>Stop</button>
+            <button class="btn btn-ghost" id="btn-timer-reset" data-requires-edit>Reset</button>
+          </div>
+          <div class="timer-actions" id="quarter-controls">
+            <button class="btn btn-ghost" id="btn-quarter-prev" data-requires-edit><i class="fa-solid fa-chevron-left"></i> Quarto</button>
+            <button class="btn btn-ghost" id="btn-quarter-next" data-requires-edit>Quarto <i class="fa-solid fa-chevron-right"></i></button>
+          </div>
+          <div class="timer-actions" id="timeouts-controls">
+            <button class="btn btn-ghost" id="btn-timeout-home" data-requires-edit data-action="timeout-home">TO Casa <span id="timeout-home-count">0</span></button>
+            <button class="btn btn-ghost" id="btn-timeout-away" data-requires-edit data-action="timeout-away">TO Ospite <span id="timeout-away-count">0</span></button>
+          </div>
+          <div class="muted" id="timeout-limit-label">Limite timeout per squadra: 0</div>
+        </div>
+
+        <div class="team-block">
+          <h2 class="team-name" id="live-away-name">Ospite</h2>
+          <div class="live-score" id="live-away-score">0</div>
+          <div class="score-actions">
+            <button class="btn btn-ghost" data-requires-edit data-score-team="away" data-score-delta="1">+1</button>
+            <button class="btn btn-ghost" data-requires-edit data-score-team="away" data-score-delta="2">+2</button>
+            <button class="btn btn-ghost" data-requires-edit data-score-team="away" data-score-delta="3">+3</button>
+            <button class="btn btn-ghost" data-requires-edit data-score-team="away" data-score-delta="-1">-1</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="roster-grid">
+        <article class="card">
+          <div class="card-header"><i class="fa-solid fa-shirt"></i> Roster Casa</div>
+          <div class="card-body table-wrap">
+            <table id="table-live-home">
+              <thead>
+                <tr>
+                  <th class="text-center">Pres.</th>
+                  <th>Giocatore</th>
+                  <th class="text-center" data-col="fouls">Falli</th>
+                  <th class="text-center">MVP</th>
+                  <th class="text-center" data-col="cards">Cart.</th>
+                  <th class="text-center">Azione</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-header"><i class="fa-solid fa-shirt"></i> Roster Ospite</div>
+          <div class="card-body table-wrap">
+            <table id="table-live-away">
+              <thead>
+                <tr>
+                  <th class="text-center">Pres.</th>
+                  <th>Giocatore</th>
+                  <th class="text-center" data-col="fouls">Falli</th>
+                  <th class="text-center">MVP</th>
+                  <th class="text-center" data-col="cards">Cart.</th>
+                  <th class="text-center">Azione</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+    </div>
+
+    <script type="module" src="js/main-live.js"></script>
+  </body>
+</html>

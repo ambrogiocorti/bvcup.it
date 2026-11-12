@@ -1,0 +1,221 @@
+﻿﻿﻿﻿﻿﻿<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin | Beach Volley Cup</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/style.css"/>
+    <link rel="shortcut icon" href="favicon.svg" type="image/x-icon">
+  </head>
+  <body class="admin-page">
+    <div class="admin-shell">
+      <button class="mobile-sidebar-toggle" id="btn-mobile-menu" type="button" aria-label="Apri menu" aria-controls="admin-sidebar" aria-expanded="false">
+        <i class="fa-solid fa-bars"></i>
+        <span>Menu</span>
+      </button>
+      <div class="sidebar-backdrop" id="sidebar-backdrop" aria-hidden="true"></div>
+
+      <aside class="sidebar" id="admin-sidebar">
+        <div class="sidebar-brand"><i class="fa-solid fa-volleyball"></i> Beach Volley Admin</div>
+        <div class="sidebar-user">
+          <div class="sidebar-user-name" id="admin-name">Amministratore</div>
+          <div class="sidebar-user-role" id="admin-role">Ruolo non assegnato</div>
+        </div>
+
+        <ul class="sidebar-menu">
+          <li><button class="sidebar-link" data-view="matches" id="link-matches"><i class="fa-solid fa-calendar"></i> Calendario</button></li>
+          <li><button class="sidebar-link" data-view="teams" id="link-teams"><i class="fa-solid fa-users"></i> Squadre</button></li>
+          <li><button class="sidebar-link" data-view="settings" id="link-settings"><i class="fa-solid fa-gears"></i> Impostazioni</button></li>
+        </ul>
+
+        <div style="margin-top: 12px; padding: 0 12px">
+          <button class="btn btn-danger" id="btn-logout" style="width: 100%; justify-content: center">
+            <i class="fa-solid fa-right-from-bracket"></i> Logout
+          </button>
+        </div>
+      </aside>
+
+      <main class="main-pane">
+        <section id="view-matches" class="view-section active">
+          <div class="top-row">
+            <h1 class="page-title">Calendario Match</h1>
+            <div class="top-row-actions">
+              <button class="btn btn-primary" id="btn-generate-matches" data-requires-match-write><i class="fa-solid fa-bolt"></i> Genera Automatico</button>
+              <button class="btn btn-primary" id="btn-new-match-alt" data-open-match-modal data-requires-match-write><i class="fa-solid fa-plus"></i> Nuova Partita</button>
+            </div>
+          </div>
+
+          <div class="filter-bar">
+            <div class="field"><label for="filter-match-team">Cerca squadra</label><input id="filter-match-team" type="text" placeholder="4A, 5B..." /></div>
+            <div class="field"><label for="filter-match-sport">Sport</label><select id="filter-match-sport"><option value="all">Tutti</option></select></div>
+            <div class="field"><label for="filter-match-phase">Fase</label><select id="filter-match-phase"><option value="all">Tutte</option><option value="Girone">Girone</option><option value="Semifinale 1">Semifinale 1</option><option value="Semifinale 2">Semifinale 2</option><option value="Finale">Finale</option></select></div>
+            <div class="field"><label for="filter-match-status">Stato</label><select id="filter-match-status"><option value="all">Tutti</option><option value="pending">Da giocare</option><option value="finished">Conclusi</option></select></div>
+          </div>
+
+          <section class="card">
+            <div class="card-body table-wrap">
+              <table>
+                <thead><tr><th>Data/Ora</th><th>Match</th><th>Risultato</th><th>Stato</th><th>Azioni</th></tr></thead>
+                <tbody id="table-matches-list"></tbody>
+              </table>
+            </div>
+          </section>
+        </section>
+
+        <section id="view-teams" class="view-section">
+          <div class="top-row">
+            <h1 class="page-title">Gestione Squadre</h1>
+            <div class="top-row-actions">
+              <button class="btn btn-ghost" id="btn-csv-teams-players" data-requires-admin-write><i class="fa-solid fa-file-csv"></i> Carica CSV</button>
+              <button class="btn btn-primary" id="btn-new-team-alt" data-open-team-modal data-requires-admin-write><i class="fa-solid fa-plus"></i> Nuova Squadra</button>
+            </div>
+          </div>
+
+          <section class="card">
+            <div class="card-body table-wrap">
+              <table>
+                <thead><tr><th>Team</th><th>Torneo</th><th>Azioni</th></tr></thead>
+                <tbody id="table-teams-body"></tbody>
+              </table>
+            </div>
+          </section>
+        </section>
+
+        <section id="view-settings" class="view-section">
+          <div class="top-row">
+            <h1 class="page-title">Impostazioni Sport</h1>
+            <button class="btn btn-primary" id="btn-save-settings" data-requires-admin-write><i class="fa-solid fa-floppy-disk"></i> Salva</button>
+          </div>
+
+          <section class="card">
+            <div class="card-body settings-layout">
+              <div class="inline-grid cols-3 settings-head-grid">
+                <div class="field hidden">
+                  <label for="settings-sport-select">Torneo</label>
+                  <select id="settings-sport-select"></select>
+                </div>
+                <div class="field" style="grid-column: 1 / span 2;">
+                  <label for="settings-selected-sport-type">Sport selezionato</label>
+                  <input id="settings-selected-sport-type" type="text" disabled />
+                </div>
+                <div class="field">
+                  <label for="settings-selected-format">Formato torneo</label>
+                  <input id="settings-selected-format" type="text" disabled />
+                </div>
+              </div>
+
+              <section class="settings-section" data-settings-group="comuni_team">
+                <h3 class="settings-section-title">Impostazioni Comuni</h3>
+                <div class="inline-grid cols-3">
+                  <div class="field"><label for="set-max-fouls">Falli max</label><input id="set-max-fouls" type="number" min="1" /></div>
+                  <div class="field"><label for="set-min-players">Giocatori minimi</label><input id="set-min-players" type="number" min="1" /></div>
+                  <div class="field"><label for="set-weight-pres">Peso Presenze (%)</label><input id="set-weight-pres" type="number" min="0" max="100" /></div>
+                  <div class="field"><label for="set-weight-fair">Peso Fair Play (%)</label><input id="set-weight-fair" type="number" min="0" max="100" /></div>
+                  <div class="checkbox-row"><input id="set-allow-mvp" type="checkbox" /><label for="set-allow-mvp">Abilita MVP torneo</label></div>
+                </div>
+              </section>
+
+              <section class="settings-section" data-settings-group="classifica_gironi">
+                <h3 class="settings-section-title">Classifica Gironi</h3>
+                <div class="inline-grid cols-3">
+                  <div class="field"><label for="set-pts-win">Punti Vittoria</label><input id="set-pts-win" type="number" min="0" /></div>
+                  <div class="field"><label for="set-pts-draw">Punti Pareggio</label><input id="set-pts-draw" type="number" min="0" /></div>
+                  <div class="field"><label for="set-pts-loss">Punti Sconfitta</label><input id="set-pts-loss" type="number" min="0" /></div>
+                </div>
+              </section>
+
+              <section class="settings-section" data-settings-group="pallavolo_live">
+                <h3 class="settings-section-title">Regole Beach Volley</h3>
+                <div class="inline-grid cols-3">
+                  <div class="field"><label for="set-volley-sets">Set totali match</label><input id="set-volley-sets" type="number" min="1" /></div>
+            </div>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <div class="modal-overlay" id="modal-team">
+      <div class="modal-box">
+        <div class="modal-header"><h2 id="title-modal-team" style="margin: 0">Nuova Squadra</h2><button class="close-btn" data-modal-close="modal-team">&times;</button></div>
+        <form id="form-team" class="inline-grid cols-2">
+          <input type="hidden" id="edit-team-id" />
+          <input type="hidden" id="select-sport-team" value="" />
+          <div class="field"><label for="input-team-name">Nome Team</label><input id="input-team-name" type="text" required /></div>
+          <div class="field" style="grid-column: 1 / -1"><label for="input-players-list">Giocatori (separati da virgola o a capo)</label><textarea id="input-players-list" rows="5"></textarea></div>
+          <div><button class="btn btn-primary" type="submit">Salva Squadra</button></div>
+        </form>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-match">
+      <div class="modal-box">
+        <div class="modal-header"><h2 style="margin: 0">Nuovo Match</h2><button class="close-btn" data-modal-close="modal-match">&times;</button></div>
+        <form id="form-match" class="inline-grid cols-2">
+          <input type="hidden" id="select-sport-match" value="" />
+          <div class="field"><label for="select-match-phase">Fase</label><select id="select-match-phase"><option value="Girone">Girone</option><option value="Semifinale 1">Semifinale 1</option><option value="Semifinale 2">Semifinale 2</option><option value="Finale">Finale</option></select></div>
+          <div class="field"><label for="select-home-team">Squadra Casa</label><select id="select-home-team" disabled></select></div>
+          <div class="field"><label for="select-away-team">Squadra Ospite</label><select id="select-away-team" disabled></select></div>
+          <div class="field" style="grid-column: 1 / -1"><label for="input-match-time">Programmato il (Data e Ora)</label><input type="datetime-local" id="input-match-time" /></div>
+          <div><button class="btn btn-primary" type="submit">Crea Match</button></div>
+        </form>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-csv-import">
+      <div class="modal-box csv-import-modal">
+        <div class="modal-header">
+          <h2 id="csv-import-title" style="margin: 0">Import CSV</h2>
+          <button class="close-btn" data-modal-close="modal-csv-import">&times;</button>
+        </div>
+
+        <input type="hidden" id="csv-import-mode" />
+
+        <div class="inline-grid">
+          <div class="field hidden">
+            <label for="csv-import-sport-select">Torneo</label>
+            <select id="csv-import-sport-select"></select>
+          </div>
+
+          <div class="csv-import-actions-row">
+            <button class="btn btn-ghost" id="btn-csv-download-template" type="button">
+              <i class="fa-solid fa-download"></i> Scarica Modello CSV
+            </button>
+            <label class="csv-file-field" for="input-csv-file">
+              <i class="fa-solid fa-file-arrow-up"></i> Seleziona CSV
+              <input id="input-csv-file" type="file" accept=".csv,text/csv" />
+            </label>
+            <button class="btn btn-primary" id="btn-csv-preview" type="button">
+              <i class="fa-solid fa-magnifying-glass"></i> Anteprima
+            </button>
+          </div>
+
+          <div class="csv-import-file-name" id="csv-import-file-name">Nessun file selezionato.</div>
+
+          <div class="csv-import-summary" id="csv-import-summary">
+            Carica un file CSV e clicca Anteprima per vedere validazioni e righe importabili.
+          </div>
+
+          <div class="csv-import-preview-wrap">
+            <table id="csv-preview-table">
+              <thead></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+
+          <div class="csv-import-report" id="csv-import-report"></div>
+        </div>
+
+        <div class="csv-import-footer">
+          <button class="btn btn-primary" id="btn-csv-confirm-import" type="button" disabled>
+            <i class="fa-solid fa-upload"></i> Conferma Import
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="js/main-admin.js"></script>
+  </body>
+</html>
